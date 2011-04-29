@@ -1,6 +1,6 @@
 /*
     SDL - Simple DirectMedia Layer
-    Copyright (C) 1997-2006 Sam Lantinga
+    Copyright (C) 1997-2009 Sam Lantinga
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -39,7 +39,7 @@
 
 /* The translation tables from a console scancode to a SDL keysym */
 /* FIXME: Free the keymap when we shut down the video mode */
-static keymap_temp *vga_keymap = NULL;
+static keymap_t *vga_keymap = NULL;
 static SDLKey keymap[128];
 static SDL_keysym *TranslateKey(int scancode, SDL_keysym *keysym);
 

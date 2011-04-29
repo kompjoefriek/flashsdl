@@ -1,6 +1,6 @@
 /*
     SDL - Simple DirectMedia Layer
-    Copyright (C) 1997-2006 Sam Lantinga
+    Copyright (C) 1997-2009 Sam Lantinga
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -73,8 +73,8 @@ int SDL_KeyboardInit(void)
 	SDL_EnableKeyRepeat(0, 0);
 
 	/* Allow environment override to disable special lock-key behavior */
-	env = getenv("SDL_NO_LOCK_KEYS");
 	SDL_NoLockKeys = 0;
+	env = SDL_getenv("SDL_DISABLE_LOCK_KEYS");
 	if (env) {
 		switch (SDL_atoi(env)) {
 			case 1:

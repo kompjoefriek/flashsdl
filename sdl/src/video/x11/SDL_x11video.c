@@ -1,6 +1,6 @@
 /*
     SDL - Simple DirectMedia Layer
-    Copyright (C) 1997-2006 Sam Lantinga
+    Copyright (C) 1997-2009 Sam Lantinga
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -109,10 +109,8 @@ static SDL_VideoDevice *X11_CreateDevice(int devindex)
 			SDL_memset(device, 0, (sizeof *device));
 			device->hidden = (struct SDL_PrivateVideoData *)
 					SDL_malloc((sizeof *device->hidden));
-			SDL_memset(device->hidden, 0, (sizeof *device->hidden));
 			device->gl_data = (struct SDL_PrivateGLData *)
 					SDL_malloc((sizeof *device->gl_data));
-			SDL_memset(device->gl_data, 0, (sizeof *device->gl_data));
 		}
 		if ( (device == NULL) || (device->hidden == NULL) ||
 		                         (device->gl_data == NULL) ) {
@@ -122,6 +120,10 @@ static SDL_VideoDevice *X11_CreateDevice(int devindex)
 		}
 		SDL_memset(device->hidden, 0, (sizeof *device->hidden));
 		SDL_memset(device->gl_data, 0, (sizeof *device->gl_data));
+
+#if SDL_VIDEO_OPENGL_GLX
+		device->gl_data->swap_interval = -1;
+#endif
 
 		/* Set the driver flags */
 		device->handles_any_size = 1;
@@ -238,7 +240,7 @@ static int xio_errhandler(Display *d)
 	/* Ack!  Lost X11 connection! */
 
 	/* We will crash if we try to clean up our display */
-	if ( current_video->hidden->Ximage ) {
+	if ( SDL_VideoSurface && current_video->hidden->Ximage ) {
 		SDL_VideoSurface->pixels = NULL;
 	}
 	current_video->hidden->X11_Display = NULL;
@@ -771,16 +773,11 @@ static void X11_SetSizeHints(_THIS, int w, int h, Uint32 flags)
 
 	hints = XAllocSizeHints();
 	if ( hints ) {
-		if ( flags & SDL_RESIZABLE ) {
-			hints->min_width = 32;
-			hints->min_height = 32;
-			hints->max_height = 4096;
-			hints->max_width = 4096;
-		} else {
+		if (!(flags & SDL_RESIZABLE)) {
 			hints->min_width = hints->max_width = w;
 			hints->min_height = hints->max_height = h;
+			hints->flags = PMaxSize | PMinSize;
 		}
-		hints->flags = PMaxSize | PMinSize;
 		if ( flags & SDL_FULLSCREEN ) {
 			hints->x = 0;
 			hints->y = 0;
@@ -1201,7 +1198,10 @@ SDL_Surface *X11_SetVideoMode(_THIS, SDL_Surface *current,
 		current->w = width;
 		current->h = height;
 		current->pitch = SDL_CalculatePitch(current);
-		X11_ResizeImage(this, current, flags);
+		if (X11_ResizeImage(this, current, flags) < 0) {
+			current = NULL;
+			goto done;
+		}
 	}
 
 	/* Clear these flags and set them only if they are in the new set. */

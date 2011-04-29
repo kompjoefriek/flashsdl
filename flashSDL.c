@@ -19,6 +19,7 @@ int			TMPFLASH_quit = 0;
 SDL_Event	TMPFLASH_event;
 int			TMPFLASH_x, TMPFLASH_y;
 Uint32		TMPFLASH_yellow;
+Uint32		TMPFLASH_red;
 
 
 /*
@@ -53,6 +54,7 @@ int main(int argc, char **argv){
  * loop so that one loop is executed on tick(). Tick's are followed by frame draws.
  */
 AS3_Val tick() {
+  int i_counter=10;
   // Poll for events
   while( SDL_PollEvent( &TMPFLASH_event ) )
   {
@@ -83,9 +85,36 @@ AS3_Val tick() {
    }
   }
 
+  while(i_counter>0)
+  {
+    // Plot the Pixel
+    putpixel(TMPFLASH_screen, TMPFLASH_x, TMPFLASH_y, (i_counter%2)?TMPFLASH_yellow:TMPFLASH_red);
+
+    switch(rand()%4)
+    {
+      case 0:
+        --TMPFLASH_x;
+        if (TMPFLASH_x<0) TMPFLASH_x = 0;
+        break;
+      case 1:
+        ++TMPFLASH_x;
+        if (TMPFLASH_x>=TMPFLASH_screen->w) TMPFLASH_x = TMPFLASH_screen->w-1;
+        break;
+      case 2:
+        --TMPFLASH_y;
+        if (TMPFLASH_y<0) TMPFLASH_y = 0;
+        break;
+      case 3:
+        ++TMPFLASH_y;
+        if (TMPFLASH_y>=TMPFLASH_screen->h) TMPFLASH_y = TMPFLASH_screen->h-1;
+        break;
+    }
+    i_counter=i_counter-1;
+  }
+
   // Plot the Pixel
-  putpixel(TMPFLASH_screen, TMPFLASH_x, TMPFLASH_y, TMPFLASH_yellow);
-  putpixel(TMPFLASH_screen, 0, 0, TMPFLASH_yellow);
+  //putpixel(TMPFLASH_screen, TMPFLASH_x, TMPFLASH_y, TMPFLASH_red);
+
 
   // Unlock Surface if necessary
   if ( SDL_MUSTLOCK(TMPFLASH_screen) )
@@ -94,7 +123,7 @@ AS3_Val tick() {
   }
 
   // Update just the part of the display that we've changed
-  SDL_UpdateRect(TMPFLASH_screen, TMPFLASH_x, TMPFLASH_y, 1, 1);
+  SDL_UpdateRect(TMPFLASH_screen, TMPFLASH_x-1, TMPFLASH_y-1, 3, 3);
   
   if (TMPFLASH_quit){
 	quitApplication();
@@ -129,8 +158,13 @@ AS3_Val setup(void *data, AS3_Val args) {
   return AS3_Int(-2);
  }
 
+ SDL_ShowCursor(SDL_DISABLE); // Disable SDL cursor
+
+ //SDL_LoadBMP
+
  // Map the color yellow to this display (R=0xff, G=0xFF, B=0x00)
  TMPFLASH_yellow = SDL_MapRGB(TMPFLASH_screen->format, 0xff, 0xff, 0x00);
+ TMPFLASH_red = SDL_MapRGB(TMPFLASH_screen->format, 0xff, 0x00, 0x00);
  
  // Make the dot at the center of the screen
  TMPFLASH_x = TMPFLASH_screen->w / 2;
