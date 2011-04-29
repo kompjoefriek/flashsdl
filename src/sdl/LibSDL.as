@@ -4,6 +4,7 @@ package sdl {
 	
 	import flash.display.DisplayObject;
 	import flash.display.PixelSnapping;
+	import flash.utils.ByteArray;
 	
 	import sdl.events.ListenerManager;
 	import sdl.video.VideoSurface;
@@ -36,7 +37,10 @@ package sdl {
 		 * Reference to the initialized C application. Contains available C callbacks.
 		 */
 		public var cLib:Object;
-			
+
+
+		private var doLog:Function;
+		
 		
 		/**
 		 * Constructor. Following construction, use getSurface() to build an SDL video surface,
@@ -48,6 +52,13 @@ package sdl {
 			cLoader = new CLibInit();
 			cLoader.putEnv("SDL_VIDEODRIVER", "flash");
 			cLib = cLoader.init();
+		}
+
+
+		public function setLog( logger:Function ):void
+		{
+			this.doLog = logger;
+			doLog("LibSDL: logger set");
 		}
 		
 		/**
@@ -67,7 +78,7 @@ package sdl {
 				this.SDLWidth = width;
 				this.SDLHeight = height;
 				
-				cLib.setup( width, height );
+				cLib.setup( this, width, height );
 				videoSurface = new VideoSurface( this, width, height );
 			}
 			return videoSurface;
@@ -83,7 +94,23 @@ package sdl {
 			if (!eventManager){
 				eventManager = new ListenerManager( eventTarget );
 				cLib.setEventManager( eventManager );	// pass manager reference to c lib for event retrieval
+
+				doLog("LibSDL: EventTarget set");
 			}
+		}
+
+
+		/**
+		 * Retrieve a previously loaded resource as a ByteArray.
+		 * 
+		 * @param	name of the resource to retrieve.
+		 *
+		 * @return	A ByteArray containing the resource.
+		 */
+		public function getResource(resname:String):ByteArray
+		{
+			doLog("getResource( "+resname+" )");
+			return new ByteArray(); //resources[resname];
 		}
 	}
 }
