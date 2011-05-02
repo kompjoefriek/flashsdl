@@ -5,6 +5,7 @@
 
 // Predefinitions
 void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel);
+void LoadResource( AS3_Val pClass, const char* fileName, SDL_Surface* pSurface );
 AS3_Val setup(void *data, AS3_Val args);
 AS3_Val quitApplication();
 AS3_Val tick();
@@ -20,8 +21,12 @@ SDL_Event	TMPFLASH_event;
 int			TMPFLASH_x, TMPFLASH_y;
 Uint32		TMPFLASH_yellow;
 Uint32		TMPFLASH_red;
-SDL_Surface* TMPFlash_bitmap;
 AS3_Val		FLASH_LibSDL;
+
+
+SDL_Surface* TMPFLASH_image = NULL;
+SDL_Surface* TMPFLASH_image2 = NULL;
+SDL_Rect	imgRect;
 
 /*
  * Lib Initialization
@@ -119,8 +124,35 @@ AS3_Val tick()
 		SDL_UnlockSurface(TMPFLASH_screen);
 	}
 
+	if (TMPFLASH_image)
+	{
+		imgRect.x = 10;
+		imgRect.y = TMPFLASH_screen->h-(TMPFLASH_image->h+10);
+		imgRect.w = TMPFLASH_image->w;
+		imgRect.h = TMPFLASH_image->h;
+		SDL_BlitSurface( TMPFLASH_image, 0, TMPFLASH_screen, &imgRect);
+	}
+	else
+	{
+		LoadResource( FLASH_LibSDL, "test.bmp", TMPFLASH_image );
+	}
+
+	if (TMPFLASH_image2)
+	{
+		imgRect.x = TMPFLASH_screen->w-(TMPFLASH_image2->w+10);
+		imgRect.y = 10;
+		imgRect.w = TMPFLASH_image2->w;
+		imgRect.h = TMPFLASH_image2->h;
+		SDL_BlitSurface( TMPFLASH_image2, 0, TMPFLASH_screen, &imgRect);
+	}
+	else
+	{
+		LoadResource( FLASH_LibSDL, "test2.bmp", TMPFLASH_image2 );
+	}
+
 	// Update just the part of the display that we've changed
-	SDL_UpdateRect(TMPFLASH_screen, TMPFLASH_x-1, TMPFLASH_y-1, 3, 3);
+	//SDL_UpdateRect(TMPFLASH_screen, TMPFLASH_x-1, TMPFLASH_y-1, 3, 3);
+	SDL_UpdateRect(TMPFLASH_screen, 0, 0, TMPFLASH_screen->w, TMPFLASH_screen->h);
 
 	if (TMPFLASH_quit)
 	{
@@ -144,8 +176,6 @@ AS3_Val setup(void *data, AS3_Val args)
 
 	// Pointer to ActionScript LibSDL class
 	FLASH_LibSDL = tmpData;
-
-	fprintf(stderr, "C: setup()");
 
 	// Initialize defaults, Video and Audio
 	if((SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO)==-1))
@@ -171,19 +201,9 @@ AS3_Val setup(void *data, AS3_Val args)
 	TMPFLASH_x = TMPFLASH_screen->w / 2;
 	TMPFLASH_y = TMPFLASH_screen->h / 2;
 
-	fprintf(stderr, "C: calling getResource()");
-	//TMPFlash_bitmap = SDL_LoadBMP("test.bmp");
-/*
-	// Typical SDL example
-	SDL_Surface * const image = SDL_LoadBMP( "MyImage.bmp");
-	//Blit image to screen
-	SDL_BlitSurface( image, 0, screen, 0);
-*/
-	// Call getResource function from FLASH_LibSDL class in actionscript
-	tmpData = AS3_CallS("getResource", FLASH_LibSDL, AS3_Array("StringType", "test.bmp"));
+	AS3_CallS("LoadResource", pClass, AS3_Array("StrType", "test.bmp"));
+	AS3_CallS("LoadResource", pClass, AS3_Array("StrType", "test2.bmp"));
 
-	fprintf(stderr, "C: called getResource()");
- 
 	return AS3_Int(0);
 }
 
@@ -245,5 +265,17 @@ void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
 		case 4:
 			*(Uint32 *)p = pixel;
 			break;
+	}
+}
+
+// Wait until flash has loaded the resource
+void LoadResource( AS3_Val pClass, const char* fileName, SDL_Surface* pSurface )
+{
+	int i_resourceLoaded=0;
+	AS3_Val resourceLoading = AS3_CallS("isResourceLoaded", pClass, AS3_Array("StrType", fileName));
+	i_resourceLoaded = AS3_IntValue(resourceLoading);
+	if (i_resourceLoaded != 0)
+	{
+		pSurface = SDL_LoadBMP(fileName);
 	}
 }
