@@ -1,19 +1,15 @@
 package utils
 {	
-	import flash.display.DisplayObject;
-	import flash.display.PixelSnapping;
-	import flash.utils.ByteArray;
-	
-	//import utils.LogWindow;
 	import utils.ResourceLoadedEvent;
+	
+	import flash.events.Event;
+	import flash.events.IOErrorEvent;
+	import flash.events.EventDispatcher;
 
-	import flash.events.*;
 	import flash.net.URLLoader;
 	import flash.net.URLLoaderDataFormat;
 	import flash.net.URLRequest;
 
-	import flash.utils.ByteArray;
-	import flash.utils.Endian;
 	import flash.utils.Dictionary;
 
 	public class ResourceLoader extends EventDispatcher
@@ -50,7 +46,7 @@ package utils
 				var newevt:ResourceLoadedEvent = new ResourceLoadedEvent(ResourceLoadedEvent.RESOURCE_ERROR, null);
 				newevt.resourcename = resname;
 				newevt.text = "Exception on load: "+error.toString();
-				dispatchEvent(newevt);
+				this.dispatchEvent(newevt);
             }
 		}
 
@@ -60,7 +56,7 @@ package utils
 			newevt.resourcename = resourcename;
 			newevt.data = evt.target.data;
 			newevt.text = "Resource loaded.";
-			dispatchEvent(evt);
+			this.dispatchEvent(newevt);
 		}
 
 		private function onResIOError(evt:IOErrorEvent):void
@@ -68,7 +64,7 @@ package utils
 			var newevt:ResourceLoadedEvent = new ResourceLoadedEvent(ResourceLoadedEvent.RESOURCE_ERROR, null);
 			newevt.resourcename = resourcename;
 			newevt.text = "Error: "+evt.toString();
-			dispatchEvent(newevt);
+			this.dispatchEvent(newevt);
 		}
 	}
 }

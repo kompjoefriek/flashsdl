@@ -5,7 +5,7 @@
 
 // Predefinitions
 void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel);
-void LoadResource( AS3_Val pClass, const char* fileName, SDL_Surface* pSurface );
+void LoadResource( AS3_Val pClass, const char* fileName, SDL_Surface** pSurface );
 AS3_Val setup(void *data, AS3_Val args);
 AS3_Val quitApplication();
 AS3_Val tick();
@@ -134,7 +134,7 @@ AS3_Val tick()
 	}
 	else
 	{
-		LoadResource( FLASH_LibSDL, "test.bmp", TMPFLASH_image );
+		LoadResource( FLASH_LibSDL, "test.bmp", &TMPFLASH_image );
 	}
 
 	if (TMPFLASH_image2)
@@ -147,7 +147,7 @@ AS3_Val tick()
 	}
 	else
 	{
-		LoadResource( FLASH_LibSDL, "test2.bmp", TMPFLASH_image2 );
+		LoadResource( FLASH_LibSDL, "test2.bmp", &TMPFLASH_image2 );
 	}
 
 	// Update just the part of the display that we've changed
@@ -201,8 +201,8 @@ AS3_Val setup(void *data, AS3_Val args)
 	TMPFLASH_x = TMPFLASH_screen->w / 2;
 	TMPFLASH_y = TMPFLASH_screen->h / 2;
 
-	AS3_CallS("LoadResource", pClass, AS3_Array("StrType", "test.bmp"));
-	AS3_CallS("LoadResource", pClass, AS3_Array("StrType", "test2.bmp"));
+	AS3_CallS("LoadResource", FLASH_LibSDL, AS3_Array("StrType", "test.bmp"));
+	AS3_CallS("LoadResource", FLASH_LibSDL, AS3_Array("StrType", "test2.bmp"));
 
 	return AS3_Int(0);
 }
@@ -269,13 +269,13 @@ void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
 }
 
 // Wait until flash has loaded the resource
-void LoadResource( AS3_Val pClass, const char* fileName, SDL_Surface* pSurface )
+void LoadResource( AS3_Val pClass, const char* fileName, SDL_Surface** pSurface )
 {
 	int i_resourceLoaded=0;
 	AS3_Val resourceLoading = AS3_CallS("isResourceLoaded", pClass, AS3_Array("StrType", fileName));
 	i_resourceLoaded = AS3_IntValue(resourceLoading);
 	if (i_resourceLoaded != 0)
 	{
-		pSurface = SDL_LoadBMP(fileName);
+		*pSurface = SDL_LoadBMP(fileName);
 	}
 }

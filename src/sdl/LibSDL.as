@@ -2,24 +2,14 @@ package sdl
 {	
 	import cmodule.libSDL.CLibInit;
 	
-	import flash.display.DisplayObject;
-	import flash.display.PixelSnapping;
-	import flash.utils.ByteArray;
-	
 	import sdl.events.ListenerManager;
 	import sdl.video.VideoSurface;
-	
+
 	import utils.LogWindow;
 	import utils.ResourceManager;
 
-	import flash.events.*;
-	import flash.net.URLLoader;
-	import flash.net.URLLoaderDataFormat;
-	import flash.net.URLRequest;
-
-	import flash.utils.ByteArray;
-	import flash.utils.Endian;
-	import flash.utils.Dictionary;
+	import flash.display.DisplayObject;
+	import flash.display.PixelSnapping;	
 
 	/**
 	 * This class contans the public interface for an SDL application.
@@ -55,8 +45,6 @@ package sdl
 		
 		private var resManager:ResourceManager;
 
-		private var counter:int;
-
 		/**
 		 * Constructor. Following construction, use getSurface() to build an SDL video surface,
 		 * and setEventTarget() to receive user input.
@@ -69,33 +57,46 @@ package sdl
 			cLoader.putEnv("SDL_VIDEODRIVER", "flash");
 			cLib = cLoader.init();
 
-			resManager = new ResourceManager( cLoader );
-			counter = 0;
+			resManager = new ResourceManager(cLoader);
+
+			this.doLog = dummyLog;
 		}
 
+		/**
+		 * Debug functionality.
+		 * 
+		 * @param	function pointer to log function (default set to dummy function)
+		 */
 		public function setLog( logger:Function ):void
 		{
 			this.doLog = logger;
 			doLog("LibSDL: logger set");
+
 			resManager.setLog( logger );
 		}
 		
+		private function dummyLog(s:String):void
+		{
+		}
+
 		/**
-		 * Retrieve a resource as a ByteArray using URLLoader.
+		 * Request a resource to be loaded
 		 * 
 		 * @param	name of the resource to retrieve.
-		 *
-		 * @return	A ByteArray containing the resource.
 		 */
 		public function LoadResource(resname:String):void
 		{
-			if (counter>1) return;
 			doLog("LibSDL.LoadResource( "+resname+" )");
 			resManager.LoadResource( resname );
-
-			counter++;
 		}
 
+		/**
+		 * Ask if the specified resource has been loaded
+		 * 
+		 * @param	name of the resource.
+		 *
+		 * @return	true when the specified resource has been loaded, false otherwise
+		 */
 		public function isResourceLoaded(resname:String):Boolean
 		{
 			return resManager.isResourceLoaded( resname );
@@ -142,29 +143,5 @@ package sdl
 				doLog("LibSDL: EventTarget set");
 			}
 		}
-
-		// Note: function stolen from http://code.google.com/p/as3-commons/source/browse/trunk/as3-commons-lang/src/main/actionscript/org/as3commons/lang/DictionaryUtils.as?spec=svn877&r=877
-		/**
-		 * Check whether the given dictionary contains the given key.
-		 *
-		 * @param dictionary the dictionary to check for a key
-		 * @param key the key to look up in the dictionary
-		 * @return <code>true</code> if the dictionary contains the given key, <code>false</code> if not
-		 */
-		private static function containsKey(dictionary:Dictionary, key:Object):Boolean
-		{
-			var result:Boolean = false;
-			
-			for (var k:*in dictionary)
-			{
-				if (key === k)
-				{
-						result = true;
-						break;
-				}
-			}
-			return result;
-		}
-
 	}
 }

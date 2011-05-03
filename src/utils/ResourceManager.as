@@ -3,15 +3,12 @@ package utils
 	import cmodule.libSDL.CLibInit;
 
 	import utils.ResourceLoader;
-	//import utils.LogWindow;
+	import utils.ResourceLoadedEvent;
 
-	import flash.events.*;
-	import flash.utils.ByteArray;
-	import flash.utils.Endian;
 	import flash.utils.Dictionary;
 
 	/**
-	 * This class contans the public interface for an SDL application.
+	 * This class contans the public interface for resource management
 	 */
 	public class ResourceManager
 	{
@@ -27,18 +24,29 @@ package utils
 			cLoader = cLoad;
 			resources = new Dictionary(true);
 			resourceloader = new Dictionary(true);
+
+			this.doLog = dummyLog;
 		}
 
+		/**
+		 * Debug functionality.
+		 * 
+		 * @param	function pointer to log function (default set to dummy function)
+		 */
 		public function setLog( logger:Function ):void
 		{
 			this.doLog = logger;
 			doLog("ResourceManager: logger set");
 		}
+
+		private function dummyLog(s:String):void
+		{
+		}
 		
 		public function LoadResource(resname:String):void
 		{
 			doLog("ResourceManager.LoadResource( "+resname+" )");
-			if (isResourceLoaded(resname))
+			if (containsKey(resources,resname))
 			{
 				doLog("ResourceManager: "+resname+" already loaded");
 				return;
@@ -50,7 +58,7 @@ package utils
 			}
 			resourceloader[resname] = new ResourceLoader();
 			resourceloader[resname].addEventListener( ResourceLoadedEvent.RESOURCE_LOADED, onResLoaded );
-			resourceloader[resname].addEventListener( ResourceLoadedEvent.RESOURCE_ERROR, onResError ); //Error handling
+			resourceloader[resname].addEventListener( ResourceLoadedEvent.RESOURCE_ERROR, onResError );
 
 			resourceloader[resname].LoadResource(resname);
 		}
@@ -59,18 +67,20 @@ package utils
 		{
 			if (containsKey(resources,resname))
 			{
-				return resources[resname];
+				doLog("ResourceManager: isResourceLoaded("+resname+"): TRUE");
+				return true;
 			}
+			doLog("ResourceManager: isResourceLoaded("+resname+"): FALSE");
 			return false;
 		}
 
 		private function onResLoaded(evt:ResourceLoadedEvent):void
 		{
-			//etv.target.data
 			doLog("onResLoaded: "+evt.resourcename);
-			resources[evt.resourcename] = evt.data;
-			cLoader.supplyFile( evt.resourcename, resources[evt.resourcename] );
+			cLoader.supplyFile( evt.resourcename, evt.data );
 			removeResourceloader( evt.resourcename );
+
+			resources[evt.resourcename] = true;
 		}
 
 		private function onResError(evt:ResourceLoadedEvent):void
@@ -84,7 +94,9 @@ package utils
 			resourceloader[resname].removeEventListener( ResourceLoadedEvent.RESOURCE_LOADED, onResLoaded );
 			resourceloader[resname].removeEventListener( ResourceLoadedEvent.RESOURCE_ERROR, onResError );
 			delete resourceloader[resname];
-			resourceloader[resname] = null;			
+			resourceloader[resname] = null;
+
+			resources[resname] = null;
 		}
 
 		// Note: function stolen from http://code.google.com/p/as3-commons/source/browse/trunk/as3-commons-lang/src/main/actionscript/org/as3commons/lang/DictionaryUtils.as?spec=svn877&r=877
@@ -109,6 +121,5 @@ package utils
 			}
 			return result;
 		}
-
 	}
 }

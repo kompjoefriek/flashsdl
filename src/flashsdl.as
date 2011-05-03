@@ -5,10 +5,6 @@ package
 	import flash.display.DisplayObject;
 	import flash.display.StageScaleMode;
 
-	import flash.utils.ByteArray;
-	import flash.utils.Endian;
-	import flash.utils.Dictionary;
-
 	import sdl.LibSDL;
 	import sdl.video.VideoSurface;
 	
@@ -50,12 +46,6 @@ package
 			
 			libSDL.setEventTarget( surfaceContainer );
 
-/*
-			var imgcircle:DisplayObject = resources["circle.png"];
-			imgcircle.x = 800 - (imgcircle.width + 10);
-			imgcircle.y = 600 - (imgcircle.height + 10);
-			addChildAt(imgcircle,numChildren-1);
-*/
 			logger.write("Done!");
 		}
 		

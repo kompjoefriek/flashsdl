@@ -1,17 +1,7 @@
 package utils
 {	
-	import flash.display.DisplayObject;
-	import flash.display.PixelSnapping;
+	import flash.events.Event;
 	import flash.utils.ByteArray;
-	
-	import flash.events.*;
-	import flash.net.URLLoader;
-	import flash.net.URLLoaderDataFormat;
-	import flash.net.URLRequest;
-
-	import flash.utils.ByteArray;
-	import flash.utils.Endian;
-	import flash.utils.Dictionary;
 
 	public class ResourceLoadedEvent extends Event
 	{
