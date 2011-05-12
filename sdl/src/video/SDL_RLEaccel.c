@@ -91,7 +91,7 @@
 #include "SDL_blit.h"
 #include "SDL_RLEaccel_c.h"
 
-#if defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)) && SDL_ASSEMBLY_ROUTINES
+#if defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)) && defined(SDL_ASSEMBLY_ROUTINES)
 #define MMX_ASMBLIT
 #endif
 

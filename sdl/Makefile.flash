@@ -1,7 +1,6 @@
 # Makefile to build the SDL library
 
-DEFS += -DFLASH
-DEFS += -DDEBUG_BUILD -DSDL_ASSEMBLY_ROUTINES=0
+DEFS += -DFLASH -DDEBUG_BUILD
 
 CC = gcc
 INCLUDE = -I./include
@@ -11,6 +10,7 @@ RANLIB	= ranlib
 
 CONFIG_H = include/SDL_config.h
 TARGET  = libSDL.a
+TARGET_LIB = SDL.l.bc
 SOURCES = \
 	src/*.c \
 	src/audio/*.c \
@@ -44,4 +44,4 @@ $(CONFIG_H):
 	cp $(CONFIG_H).default $(CONFIG_H)
 
 clean:
-	rm -f $(TARGET) $(OBJECTS)
+	rm -f $(TARGET) $(TARGET_LIB) $(OBJECTS)

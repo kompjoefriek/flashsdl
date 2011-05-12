@@ -30,7 +30,7 @@
    determine if the Processor Pack is installed, as far as I can tell.
 */
 
-#if SDL_ASSEMBLY_ROUTINES
+#if defined(SDL_ASSEMBLY_ROUTINES)
 #  if defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
 #    define MMX_ASMBLIT 1
 #    define GCC_ASMBLIT 1

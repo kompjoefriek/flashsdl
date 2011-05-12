@@ -4,12 +4,13 @@ package sdl
 	
 	import sdl.events.ListenerManager;
 	import sdl.video.VideoSurface;
+	import sdl.audio.AudioBridge;
 
-	import utils.LogWindow;
 	import utils.ResourceManager;
 
 	import flash.display.DisplayObject;
-	import flash.display.PixelSnapping;	
+	import flash.events.Event;
+	import flash.utils.ByteArray;
 
 	/**
 	 * This class contans the public interface for an SDL application.
@@ -19,6 +20,9 @@ package sdl
 		
 		/** @private */
 		protected var videoSurface:VideoSurface;
+
+		/** @private */
+		protected var audioBridge:AudioBridge;
 		
 		/** @private */
 		protected var eventManager:ListenerManager;
@@ -45,6 +49,13 @@ package sdl
 		
 		private var resManager:ResourceManager;
 
+		// REMOVE THE FOLLOWING DEBUG LINES TO LOAD RESOURCES FROM URL'S
+		[Embed(source="../test.bmp", mimeType="application/octet-stream")]	// DEBUG
+		private var TestImage:Class;										// DEBUG
+		[Embed(source="../test.wav", mimeType="application/octet-stream")]	// DEBUG
+		private var TestSound:Class;										// DEBUG
+		[Embed(source="../test2.wav", mimeType="application/octet-stream")]	// DEBUG
+		private var TestSound2:Class;										// DEBUG
 		/**
 		 * Constructor. Following construction, use getSurface() to build an SDL video surface,
 		 * and setEventTarget() to receive user input.
@@ -58,6 +69,13 @@ package sdl
 			cLib = cLoader.init();
 
 			resManager = new ResourceManager(cLoader);
+			// REMOVE THE FOLLOWING DEBUG LINES TO LOAD RESOURCES FROM URL'S
+			var testImage:ByteArray = new TestImage(); // test.bmp		// DEBUG
+			resManager.LoadResourceFromArray("test.bmp", testImage );	// DEBUG
+			var testSound:ByteArray = new TestSound(); // test.wav		// DEBUG
+			resManager.LoadResourceFromArray("test.wav", testSound );	// DEBUG
+			var testSound2:ByteArray = new TestSound2(); // test2.wav	// DEBUG
+			resManager.LoadResourceFromArray("test2.wav", testSound2 );	// DEBUG
 
 			this.doLog = dummyLog;
 		}
@@ -116,13 +134,16 @@ package sdl
 		public function getSurface( width:int=0, height:int=0 ):VideoSurface
 		{
 			if (!videoSurface)
-			{
-				
+			{				
 				this.SDLWidth = width;
 				this.SDLHeight = height;
 				
 				cLib.setup( this, width, height );
 				videoSurface = new VideoSurface( this, width, height );
+
+				audioBridge = new AudioBridge( this );
+
+				videoSurface.addEventListener( Event.ENTER_FRAME, onEnterFrame );
 			}
 			return videoSurface;
 		}
@@ -143,5 +164,14 @@ package sdl
 				doLog("LibSDL: EventTarget set");
 			}
 		}
+
+
+		private function onEnterFrame( e:Event ):void
+		{
+			cLib.tick( audioBridge.requestedSamples );
+			videoSurface.updateDisplay( cLib.getDisplayPointer() );
+			audioBridge.updateAudio();
+		}
+
 	}
 }

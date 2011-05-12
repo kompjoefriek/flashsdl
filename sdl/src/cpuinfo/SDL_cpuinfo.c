@@ -56,7 +56,7 @@ static void illegal_instruction(int sig)
 static __inline__ int CPU_haveCPUID(void)
 {
 	int has_CPUID = 0;
-#if defined(__GNUC__) && defined(i386)
+#if defined(__GNUC__) && defined(i386) && defined(SDL_ASSEMBLY_ROUTINES)
 	__asm__ (
 "        pushfl                      # Get original EFLAGS             \n"
 "        popl    %%eax                                                 \n"
@@ -74,7 +74,7 @@ static __inline__ int CPU_haveCPUID(void)
 	:
 	: "%eax", "%ecx"
 	);
-#elif defined(__GNUC__) && defined(__x86_64__)
+#elif defined(__GNUC__) && defined(__x86_64__) && defined(SDL_ASSEMBLY_ROUTINES)
 /* Technically, if this is being compiled under __x86_64__ then it has 
 CPUid by definition.  But it's nice to be able to prove it.  :)      */
 	__asm__ (
@@ -94,7 +94,7 @@ CPUid by definition.  But it's nice to be able to prove it.  :)      */
 	:
 	: "%rax", "%rcx"
 	);
-#elif (defined(_MSC_VER) && defined(_M_IX86)) || defined(__WATCOMC__)
+#elif (defined(_MSC_VER) && defined(_M_IX86)) || defined(__WATCOMC__) && defined(SDL_ASSEMBLY_ROUTINES)
 	__asm {
         pushfd                      ; Get original EFLAGS
         pop     eax
@@ -109,7 +109,7 @@ CPUid by definition.  But it's nice to be able to prove it.  :)      */
         mov     has_CPUID,1         ; We have CPUID support
 done:
 	}
-#elif defined(__sun) && defined(__i386)
+#elif defined(__sun) && defined(__i386) && defined(SDL_ASSEMBLY_ROUTINES)
 	__asm (
 "       pushfl                 \n"
 "	popl    %eax           \n"
@@ -124,7 +124,7 @@ done:
 "	movl    $1,-8(%ebp)    \n"
 "1:                            \n"
 	);
-#elif defined(__sun) && defined(__amd64)
+#elif defined(__sun) && defined(__amd64) && defined(SDL_ASSEMBLY_ROUTINES)
 	__asm (
 "       pushfq                 \n"
 "       popq    %rax           \n"
@@ -146,7 +146,7 @@ done:
 static __inline__ int CPU_getCPUIDFeatures(void)
 {
 	int features = 0;
-#if defined(__GNUC__) && defined(i386)
+#if defined(__GNUC__) && defined(i386) && defined(SDL_ASSEMBLY_ROUTINES)
 	__asm__ (
 "        movl    %%ebx,%%edi\n"
 "        xorl    %%eax,%%eax         # Set up for CPUID instruction    \n"
@@ -163,7 +163,7 @@ static __inline__ int CPU_getCPUIDFeatures(void)
 	:
 	: "%eax", "%ecx", "%edx", "%edi"
 	);
-#elif defined(__GNUC__) && defined(__x86_64__)
+#elif defined(__GNUC__) && defined(__x86_64__) && defined(SDL_ASSEMBLY_ROUTINES)
 	__asm__ (
 "        movq    %%rbx,%%rdi\n"
 "        xorl    %%eax,%%eax         # Set up for CPUID instruction    \n"
@@ -180,7 +180,7 @@ static __inline__ int CPU_getCPUIDFeatures(void)
 	:
 	: "%rax", "%rbx", "%rcx", "%rdx", "%rdi"
 	);
-#elif (defined(_MSC_VER) && defined(_M_IX86)) || defined(__WATCOMC__)
+#elif (defined(_MSC_VER) && defined(_M_IX86)) || defined(__WATCOMC__) && defined(SDL_ASSEMBLY_ROUTINES)
 	__asm {
         xor     eax, eax            ; Set up for CPUID instruction
         cpuid                       ; Get and save vendor ID
@@ -192,7 +192,7 @@ static __inline__ int CPU_getCPUIDFeatures(void)
         mov     features, edx
 done:
 	}
-#elif defined(__sun) && (defined(__i386) || defined(__amd64))
+#elif defined(__sun) && (defined(__i386) || defined(__amd64)) && defined(SDL_ASSEMBLY_ROUTINES)
 	    __asm(
 "        movl    %ebx,%edi\n"
 "        xorl    %eax,%eax         \n"
@@ -216,7 +216,7 @@ done:
 static __inline__ int CPU_getCPUIDFeaturesExt(void)
 {
 	int features = 0;
-#if defined(__GNUC__) && defined(i386)
+#if defined(__GNUC__) && defined(i386) && defined(SDL_ASSEMBLY_ROUTINES)
 	__asm__ (
 "        movl    %%ebx,%%edi\n"
 "        movl    $0x80000000,%%eax   # Query for extended functions    \n"
@@ -232,7 +232,7 @@ static __inline__ int CPU_getCPUIDFeaturesExt(void)
 	:
 	: "%eax", "%ecx", "%edx", "%edi"
 	);
-#elif defined(__GNUC__) && defined (__x86_64__)
+#elif defined(__GNUC__) && defined (__x86_64__) && defined(SDL_ASSEMBLY_ROUTINES)
 	__asm__ (
 "        movq    %%rbx,%%rdi\n"
 "        movl    $0x80000000,%%eax   # Query for extended functions    \n"
@@ -259,7 +259,7 @@ static __inline__ int CPU_getCPUIDFeaturesExt(void)
         mov     features,edx
 done:
 	}
-#elif defined(__sun) && ( defined(__i386) || defined(__amd64) )
+#elif defined(__sun) && ( defined(__i386) || defined(__amd64) ) && defined(SDL_ASSEMBLY_ROUTINES)
 	    __asm (
 "        movl    %ebx,%edi\n"
 "        movl    $0x80000000,%eax \n"

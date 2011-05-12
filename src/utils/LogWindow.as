@@ -16,11 +16,11 @@ package utils
 			//width = _w;
 			//height = _h;
 
-			graphics.beginFill(0x666666, 0.25); // second param controls alpha
+			graphics.beginFill(0x333333, 0.50); // second param controls alpha
 			graphics.drawRect(0,0,_w,_h); // making rect the size of the tf
 			graphics.endFill();
 
-			_fmt = new TextFormat("_sans", 11, 0xCCCCCC);
+			_fmt = new TextFormat("_sans", 11, 0xFFFFFF);
 			_tf = new TextField();
 			// Add little margin
 			_tf.x=2;
@@ -36,7 +36,8 @@ package utils
 
 		public function write(txt:String):void
 		{
-			_tf.appendText("\n"+txt);
+			var now:Date = new Date();
+			_tf.appendText("\n"+now.getTime()+": "+txt);
 			_tf.scrollV = _tf.maxScrollV;
 		}
 	

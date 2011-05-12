@@ -302,13 +302,13 @@ int SDL_SoftStretch(SDL_Surface *src, SDL_Rect *srcrect,
 		}
 #ifdef USE_ASM_STRETCH
 		if (use_asm) {
-#ifdef __GNUC__
+#if defined(__GNUC__) && defined(SDL_ASSEMBLY_ROUTINES)
 			__asm__ __volatile__ (
 			"call *%4"
 			: "=&D" (u1), "=&S" (u2)
 			: "0" (dstp), "1" (srcp), "r" (copy_row)
 			: "memory" );
-#elif defined(_MSC_VER) || defined(__WATCOMC__)
+#elif (defined(_MSC_VER) || defined(__WATCOMC__)) && defined(SDL_ASSEMBLY_ROUTINES)
 		{ void *code = copy_row;
 			__asm {
 				push edi

@@ -20,16 +20,22 @@
     slouken@libsdl.org
 */
 
-#ifndef _SDL_config_flashvm_h
-#define _SDL_config_flashvm_h
+#ifndef _SDL_config_flash_h
+#define _SDL_config_flash_h
 
 #include "SDL_platform.h"
 
 #include <stdarg.h>
 
-#define SDL_ASSEMBLY_ROUTINES 0
-#define SDL_HERMES_BLITTERS 0
-#define SDL_ALTIVEC_BLITTERS 0
+#ifdef SDL_ASSEMBLY_ROUTINES
+#undef SDL_ASSEMBLY_ROUTINES
+#endif
+#ifdef SDL_HERMES_BLITTERS
+#undef SDL_HERMES_BLITTERS
+#endif
+#ifdef SDL_ALTIVEC_BLITTERS
+#undef SDL_ALTIVEC_BLITTERS
+#endif
 
 /* Useful headers */
 #define HAVE_ALLOCA_H 1
@@ -106,4 +112,4 @@
 #define SDL_VIDEO_DRIVER_DUMMY	0
 #define SDL_VIDEO_DRIVER_FLASH	1
 
-#endif /* _SDL_config_minimal_h */
+#endif /* _SDL_config_flash_h */

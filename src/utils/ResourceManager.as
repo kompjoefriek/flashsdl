@@ -5,6 +5,7 @@ package utils
 	import utils.ResourceLoader;
 	import utils.ResourceLoadedEvent;
 
+	import flash.utils.ByteArray;
 	import flash.utils.Dictionary;
 
 	/**
@@ -43,6 +44,12 @@ package utils
 		{
 		}
 		
+		public function LoadResourceFromArray(resname:String, data:ByteArray):void
+		{
+			cLoader.supplyFile( resname, data );
+			resources[resname] = true;
+		}
+
 		public function LoadResource(resname:String):void
 		{
 			doLog("ResourceManager.LoadResource( "+resname+" )");
@@ -65,7 +72,7 @@ package utils
 
 		public function isResourceLoaded(resname:String):Boolean
 		{
-			if (containsKey(resources,resname))
+			if (containsKey(resources,resname) && !containsKey(resourceloader,resname))
 			{
 				doLog("ResourceManager: isResourceLoaded("+resname+"): TRUE");
 				return true;

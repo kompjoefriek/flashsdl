@@ -27,7 +27,7 @@
 #include "SDL_RLEaccel_c.h"
 #include "SDL_pixels_c.h"
 
-#if defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)) && SDL_ASSEMBLY_ROUTINES
+#if defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)) && defined(SDL_ASSEMBLY_ROUTINES)
 #define MMX_ASMBLIT
 #if (__GNUC__ > 2)  /* SSE instructions aren't in GCC 2. */
 #define SSE_ASMBLIT

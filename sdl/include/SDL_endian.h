@@ -66,19 +66,21 @@ extern "C" {
  */
 /*@{*/
 #if defined(__GNUC__) && defined(__i386__) && \
-   !(__GNUC__ == 2 && __GNUC_MINOR__ <= 95 /* broken gcc version */)
+   !(__GNUC__ == 2 && __GNUC_MINOR__ <= 95 /* broken gcc version */) && \
+   defined(SDL_ASSEMBLY_ROUTINES)
 static __inline__ Uint16 SDL_Swap16(Uint16 x)
 {
 	__asm__("xchgb %b0,%h0" : "=q" (x) :  "0" (x));
 	return x;
 }
-#elif defined(__GNUC__) && defined(__x86_64__)
+#elif defined(__GNUC__) && defined(__x86_64__) && defined(SDL_ASSEMBLY_ROUTINES)
 static __inline__ Uint16 SDL_Swap16(Uint16 x)
 {
 	__asm__("xchgb %b0,%h0" : "=Q" (x) :  "0" (x));
 	return x;
 }
-#elif defined(__GNUC__) && (defined(__powerpc__) || defined(__ppc__))
+#elif defined(__GNUC__) && (defined(__powerpc__) || defined(__ppc__)) && \
+   defined(SDL_ASSEMBLY_ROUTINES)
 static __inline__ Uint16 SDL_Swap16(Uint16 x)
 {
 	Uint16 result;
@@ -86,7 +88,8 @@ static __inline__ Uint16 SDL_Swap16(Uint16 x)
 	__asm__("rlwimi %0,%2,8,16,23" : "=&r" (result) : "0" (x >> 8), "r" (x));
 	return result;
 }
-#elif defined(__GNUC__) && (defined(__M68000__) || defined(__M68020__))
+#elif defined(__GNUC__) && (defined(__M68000__) || defined(__M68020__)) && \
+   defined(SDL_ASSEMBLY_ROUTINES)
 static __inline__ Uint16 SDL_Swap16(Uint16 x)
 {
 	__asm__("rorw #8,%0" : "=d" (x) :  "0" (x) : "cc");
@@ -99,19 +102,21 @@ static __inline__ Uint16 SDL_Swap16(Uint16 x) {
 #endif
 
 #if defined(__GNUC__) && defined(__i386__) && \
-   !(__GNUC__ == 2 && __GNUC_MINOR__ <= 95 /* broken gcc version */)
+   !(__GNUC__ == 2 && __GNUC_MINOR__ <= 95 /* broken gcc version */) && \
+   defined(SDL_ASSEMBLY_ROUTINES)
 static __inline__ Uint32 SDL_Swap32(Uint32 x)
 {
 	__asm__("bswap %0" : "=r" (x) : "0" (x));
 	return x;
 }
-#elif defined(__GNUC__) && defined(__x86_64__)
+#elif defined(__GNUC__) && defined(__x86_64__) && defined(SDL_ASSEMBLY_ROUTINES)
 static __inline__ Uint32 SDL_Swap32(Uint32 x)
 {
 	__asm__("bswapl %0" : "=r" (x) : "0" (x));
 	return x;
 }
-#elif defined(__GNUC__) && (defined(__powerpc__) || defined(__ppc__))
+#elif defined(__GNUC__) && (defined(__powerpc__) || defined(__ppc__)) && \
+   defined(SDL_ASSEMBLY_ROUTINES)
 static __inline__ Uint32 SDL_Swap32(Uint32 x)
 {
 	Uint32 result;
@@ -121,7 +126,8 @@ static __inline__ Uint32 SDL_Swap32(Uint32 x)
 	__asm__("rlwimi %0,%2,24,0,7"   : "=&r" (result) : "0" (result),    "r" (x));
 	return result;
 }
-#elif defined(__GNUC__) && (defined(__M68000__) || defined(__M68020__))
+#elif defined(__GNUC__) && (defined(__M68000__) || defined(__M68020__)) && \
+   defined(SDL_ASSEMBLY_ROUTINES)
 static __inline__ Uint32 SDL_Swap32(Uint32 x)
 {
 	__asm__("rorw #8,%0\n\tswap %0\n\trorw #8,%0" : "=d" (x) :  "0" (x) : "cc");
@@ -135,7 +141,8 @@ static __inline__ Uint32 SDL_Swap32(Uint32 x) {
 
 #ifdef SDL_HAS_64BIT_TYPE
 #if defined(__GNUC__) && defined(__i386__) && \
-   !(__GNUC__ == 2 && __GNUC_MINOR__ <= 95 /* broken gcc version */)
+   !(__GNUC__ == 2 && __GNUC_MINOR__ <= 95 /* broken gcc version */) && \
+   defined(SDL_ASSEMBLY_ROUTINES)
 static __inline__ Uint64 SDL_Swap64(Uint64 x)
 {
 	union { 
@@ -148,7 +155,7 @@ static __inline__ Uint64 SDL_Swap64(Uint64 x)
 	        : "0" (v.s.a), "1" (v.s.b)); 
 	return v.u;
 }
-#elif defined(__GNUC__) && defined(__x86_64__)
+#elif defined(__GNUC__) && defined(__x86_64__) && defined(SDL_ASSEMBLY_ROUTINES)
 static __inline__ Uint64 SDL_Swap64(Uint64 x)
 {
 	__asm__("bswapq %0" : "=r" (x) : "0" (x));
