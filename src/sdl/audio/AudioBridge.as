@@ -17,6 +17,8 @@ package sdl.audio
 
 		private var mute:Boolean;
 
+		private var doLog:Function;
+
 		internal var libSDL:LibSDL;
 		
 		public var requestedSamples:int;
@@ -25,11 +27,13 @@ package sdl.audio
 		{
 			mute = false;
 			this.libSDL = libSDL;		
-			requestedSamples = 300;
+			requestedSamples = 900;
 			
 			// Audio
 			sound = new Sound;
 			sound.addEventListener( SampleDataEvent.SAMPLE_DATA, onSampleData );			
+			
+			doLog = function():void { };
 		}
 		
 		public function set muted( muted:Boolean ):void
@@ -46,12 +50,14 @@ package sdl.audio
 		{
 			this.soundChannel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
 			this.soundChannel = null;
+			doLog( "SoundComplete" );
 		}
 		
 		private function onSampleData( e:SampleDataEvent ):void
 		{
 			e.data.endian = Endian.LITTLE_ENDIAN;
 			libSDL.cLib.paintSound( e.data );
+			//doLog( "SampleData: "+e.data.length );
 		}
 
 		public function updateAudio():void
@@ -62,5 +68,16 @@ package sdl.audio
 				soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
 			}
 		}
+		
+		/**
+		 * Debug functionality.
+		 * 
+		 * @param	function pointer to log function (default set to dummy function)
+		 */
+		public function setLog( logger:Function ):void
+		{
+			this.doLog = logger;
+			doLog("ResourceManager: logger set");
+		}		
 	}
 }

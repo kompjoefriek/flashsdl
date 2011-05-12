@@ -77,7 +77,9 @@ package sdl
 			var testSound2:ByteArray = new TestSound2(); // test2.wav	// DEBUG
 			resManager.LoadResourceFromArray("test2.wav", testSound2 );	// DEBUG
 
-			this.doLog = dummyLog;
+			audioBridge = new AudioBridge( this );
+			
+			this.doLog = function():void {};
 		}
 
 		/**
@@ -91,10 +93,10 @@ package sdl
 			doLog("LibSDL: logger set");
 
 			resManager.setLog( logger );
-		}
-		
-		private function dummyLog(s:String):void
-		{
+			if (audioBridge)
+			{
+				audioBridge.setLog( logger )
+			}
 		}
 
 		/**
@@ -140,9 +142,7 @@ package sdl
 				
 				cLib.setup( this, width, height );
 				videoSurface = new VideoSurface( this, width, height );
-
-				audioBridge = new AudioBridge( this );
-
+			
 				videoSurface.addEventListener( Event.ENTER_FRAME, onEnterFrame );
 			}
 			return videoSurface;

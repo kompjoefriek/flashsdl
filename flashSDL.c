@@ -38,8 +38,8 @@ int			TMPFLASH_dir_h = 0; // 0 is left, 1 is right
 int			TMPFLASH_dir_v = 0; // 0 is up, 1 is down
 
 #define NUM_SOUNDS 4
-#define MIN_SAMPLES 512
-#define MAX_SAMPLES 4096
+#define MIN_SAMPLES 2048
+#define MAX_SAMPLES 8192
 struct sample {
     Uint8 *data;
     Uint32 dpos;
@@ -260,7 +260,7 @@ AS3_Val setup(void *data, AS3_Val args)
 
 	/* Specify what kind of audio to output */
 	fmt.freq = 22050;
-	fmt.format = AUDIO_S16;
+	fmt.format = AUDIO_S8;
 	fmt.channels = 2;
 	fmt.samples = MIN_SAMPLES;        /* A good value for games = 512 */
 	fmt.callback = mixaudio;
@@ -269,7 +269,7 @@ AS3_Val setup(void *data, AS3_Val args)
 	if (fmt.format != AUDIO_U8 && fmt.format != AUDIO_S8)
 	{
 		// Must be 16bit
-		BYTES_PER_SAMPLE = 2;
+		//BYTES_PER_SAMPLE = 2;
 	}
 
 	SDLSoundBuffer = malloc( sizeof(Uint8) * MAX_SAMPLES * BYTES_PER_SAMPLE * fmt.channels );
@@ -382,7 +382,6 @@ void LoadResource( AS3_Val pClass, const char* fileName, SDL_Surface** pSurface 
 	}
 }
 
-float sineposition = 0.0f;
 AS3_Val Flash_paintSound( void *data, AS3_Val args )
 {
 	// Unpack
@@ -390,7 +389,6 @@ AS3_Val Flash_paintSound( void *data, AS3_Val args )
 	AS3_ArrayValue( args, "AS3ValType", &soundStream );
 
 	int idxSample = 0;
-/*
 	int idxByte = 0;
 	Uint32 iTemp;
 
@@ -414,12 +412,13 @@ AS3_Val Flash_paintSound( void *data, AS3_Val args )
 	for (idxSample=0; idxSample<bufferedSamples*fmt.channels; idxSample++)
 	{
 		// Attempt to convert multi-byte samples to floats
-		iTemp = 0;
-		for (idxByte=0; idxByte<BYTES_PER_SAMPLE; idxByte++)
-		{
-			iTemp |= SDLSoundBuffer[idxSample*BYTES_PER_SAMPLE+idxByte] << (((BYTES_PER_SAMPLE-1)-idxByte)*8);
-		}
-		FlashSoundBuffer[idxSample] = iTemp/(float)(1<<((BYTES_PER_SAMPLE*8)-1)); // Half positive, half negative. So 7 in stead of 8
+		//iTemp = 0;
+		//for (idxByte=0; idxByte<BYTES_PER_SAMPLE; idxByte++)
+		//{
+		//	iTemp |= SDLSoundBuffer[idxSample*BYTES_PER_SAMPLE*fmt.channels+idxByte] << (((BYTES_PER_SAMPLE-1)-idxByte)*8);
+		//}
+		//FlashSoundBuffer[idxSample] = iTemp/(float)(1<<((BYTES_PER_SAMPLE*8)-1));
+		FlashSoundBuffer[idxSample] = SDLSoundBuffer[idxSample*fmt.channels]/128.0f; // hard coded signed 8bit = 2^(8-1)
 	}
 	AS3_ByteArray_writeBytes( soundStream, FlashSoundBuffer, sizeof(float) * bufferedSamples * fmt.channels  ); // Bps * samples * channels
 	
@@ -429,21 +428,27 @@ AS3_Val Flash_paintSound( void *data, AS3_Val args )
 	memset(SDLSoundBuffer, 0, sizeof(Uint8) * bufferedSamples * BYTES_PER_SAMPLE * fmt.channels);
 
 	bufferedSamples = 0;
-*/
+/*
 	// Debug code: outputs a sine wave to test data throughput
+	if ( bufferedSamples < MIN_SAMPLES )
+	{
+		bufferedSamples = MIN_SAMPLES;
+	}
+	else if (bufferedSamples > MAX_SAMPLES)
+	{
+		bufferedSamples = MAX_SAMPLES;
+	}
+
+	static float sineposition = 0.0f;
 	memset(FlashSoundBuffer, 0, sizeof(float) * MAX_SAMPLES * fmt.channels);
 	for (idxSample=0; idxSample<bufferedSamples; idxSample++)
 	{
 		FlashSoundBuffer[idxSample] = sin(sineposition);
 		sineposition += 0.05;
-		if (sineposition > M_PI*2)
-		{
-			sineposition -= M_PI*2;
-		}
 	}
-	AS3_ByteArray_writeBytes( soundStream, FlashSoundBuffer, sizeof(float) * bufferedSamples  ); // Bps * samples * channels
+	AS3_ByteArray_writeBytes( soundStream, FlashSoundBuffer, sizeof(float) * bufferedSamples  );
 	bufferedSamples = 0;
-
+*/
 	return AS3_Int(0);
 }
 
