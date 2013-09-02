@@ -6,6 +6,11 @@ FlashSDL - Quick Guide
 
 [http://www.twitter.com/emcmanus](http://www.twitter.com/emcmanus)
 
+## This project was discontinued in 2011 ##
+If you are still interessed in this project, visit [Bruce Jawn's blog](http://bruce-lab.blogspot.nl/2012_09_01_archive.html)
+
+Ed McManus' FlashSDL could provide me with an easy way to use my existing C++ games in Flash. I soon ran into performance issues and couldn't get the sound going, so i decided to just let Flash draw my images and play my sounds. C++ just passes the calls to Flash, and it worked for me.
+
 
 ## License ##
 
